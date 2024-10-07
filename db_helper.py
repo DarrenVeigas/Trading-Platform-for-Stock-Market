@@ -91,3 +91,4 @@ for symbol in us_symbols:
         print(f"Failed to fetch data for {symbol} with all API keys.")
 cursor.close()
 db_connection.close()
+
