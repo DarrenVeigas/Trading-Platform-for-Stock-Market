@@ -22,7 +22,6 @@ month = now.month
 day = now.day-1
 
 date=f"{year}-{month:02}-{day:02}"
-date=f"2024-10-04"
 db_connection = mysql.connect(
     host='localhost',  
     user=os.getenv('DB_USER'),  
@@ -35,10 +34,10 @@ def difference():
     current_hour = now.hour
     current_minute = now.minute
 
-    target_hour = 13
+    target_hour = 9
     target_minute = 30
 
-    difference_in_minutes = (15 * 60 + 30) - (target_hour * 60 + target_minute)-1
+    difference_in_minutes = (current_hour* 60 + current_minute) - (target_hour * 60 + target_minute)-1
     return difference_in_minutes
 def fetch_data(symbol):
     
@@ -75,7 +74,7 @@ def fetch_intraday(symbol):
 query = "SELECT `date` FROM stock_data ORDER BY `sid` ASC LIMIT 1"
 cursor.execute(query)
 curr_date = cursor.fetchone()[0]
-
+print(curr_date,date)
 for symbol in us_symbols:
 
     if str(curr_date)<date:
@@ -93,8 +92,9 @@ for symbol in us_symbols:
                     `open` = VALUES(`open`), 
                     `high` = VALUES(`high`),
                     `low` = VALUES(`low`),
-                    `price`=VALUES(`price`)
-                    `close` = VALUES(`close`)
+                    `price`=VALUES(`price`),
+                    `close` = VALUES(`close`),
+                    `date`=VALUES(`date`)
                 ''', (symbol, open, high, low,open, close, date))
             db_connection.commit()
 
