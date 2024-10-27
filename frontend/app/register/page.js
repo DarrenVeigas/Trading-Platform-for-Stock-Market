@@ -19,16 +19,16 @@ export default function Register() {
     const response = await fetch('http://localhost:8000/register', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',  // Changed to JSON
       },
-      body: new URLSearchParams({
+      body: JSON.stringify({
         name,
         email,
         PAN,
         password,
         dob,
         gender,
-      }),
+    }),
     });
 
     const data = await response.json();

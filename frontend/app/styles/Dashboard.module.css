@@ -1,0 +1,36 @@
+.dashboardContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .searchBar {
+    width: 200px;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+  
+  .filters {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .filter {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .mainContent {
+    overflow-x: auto;
+  }
+  
