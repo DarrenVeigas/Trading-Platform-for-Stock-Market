@@ -61,9 +61,11 @@ def fetch_intraday(symbol):
         }
         
         r = requests.get(url, params=params)
-        if r.status_code == 200  :
+        if r.status_code == 200  and 9<=now.hour<=15:
             time=difference()
             return r.json()[time]
+        elif r.status_code == 200  and now.hour>15:
+            return r.json()[359]
         else:
             print(f"Failed to fetch data: {r.status_code}")
             return None

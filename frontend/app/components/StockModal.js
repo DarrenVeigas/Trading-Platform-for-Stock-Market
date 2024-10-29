@@ -1,7 +1,7 @@
 import React, { useState ,useEffect} from 'react';
 import styles from '../styles/StockModel.module.css';
 
-const StockModal = ({ stock, onClose }) => {
+const StockModal = ({ stock, symbol,onClose }) => {
     const [quantity, setQuantity] = useState(1);
     const [price, setPrice] = useState(stock ? stock.price : 0);
     const [action, setAction] = useState(null); 
@@ -25,7 +25,7 @@ const StockModal = ({ stock, onClose }) => {
         onClose();
       }
     };
-    
+
     const handleActionClick = (selectedAction) => {
         setAction(selectedAction);
       };
@@ -42,8 +42,8 @@ const StockModal = ({ stock, onClose }) => {
     return (
       <div className={styles.modalOverlay} onClick={handleOutsideClick}>
         <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-          <h2>{stock.name}</h2>
-          <p>Symbol: {stock.symbol}</p>
+          <h2>{symbol}</h2>
+          <p>Symbol: {symbol}</p>
           <p>Open Price: ${stock.open.toFixed(2)}</p>
           <p>Close Price: ${stock.close.toFixed(2)}</p>
           <p>High:${stock.high?.toFixed(2) || 'N/A'}</p>

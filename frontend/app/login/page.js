@@ -27,8 +27,10 @@ export default function Login() {
     setMessage(data.message || 'Invalid Email or Password');
 
     if (response.ok) {
+      localStorage.setItem('userId', email); // Adjust based on your API response
+
       setTimeout(() => {
-        router.push('/'); // Redirect to home page after successful login
+        router.push('/dashboard'); // Redirect to home page after successful login
       }, 2000);
     }
   };

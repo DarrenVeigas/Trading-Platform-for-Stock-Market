@@ -1,3 +1,5 @@
+"use client"; 
+
 // // pages/stocks.js
 // import React from 'react';
 // import StockCard from '../components/StockCard';
@@ -28,8 +30,17 @@
 import React from 'react';
 import StockTable from '../components/StockTable';
 import styles from '../styles/Dashboard.module.css';
-
+import { useState,useEffect } from 'react';
 const DashboardPage = () => {
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const id = localStorage.getItem('userId'); // Get userId from local storage
+    if (id) {
+      setUserId(id);
+    }
+  }, []);
+  console.log(userId)
   return (
     <div className={styles.dashboardContainer}>
       <header className={styles.header}>

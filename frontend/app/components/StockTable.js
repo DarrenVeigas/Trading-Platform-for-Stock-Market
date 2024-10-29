@@ -24,9 +24,9 @@ const StockTable = () => {
   if (!stocksData) {
     return <p>Loading...</p>;
   }
-  const handleStockClick = (stock) => {
-    setSelectedStock(stock);
-  };
+  const handleStockClick = (stock,symbol) => {
+    setSelectedStock({ ...stock, symbol });
+    };
 
   const closeModal = () => {
   setSelectedStock(null);
@@ -92,9 +92,8 @@ const StockTable = () => {
       </thead>
       <tbody>
         {Object.entries(stocksData).map(([symbol, stock], index) => (
-          <tr key={index} onClick={() => handleStockClick(stock)}>
+          <tr key={index} onClick={() => handleStockClick(stock,symbol)}>
             <td>{symbol}</td>
-            <td>{stock.name || 'N/A'}</td> {/* Add stock name if available */}
             <td>${stock.open?.toFixed(2) || 'N/A'}</td>
             <td>${stock.high?.toFixed(2) || 'N/A'}</td>
             <td>${stock.low?.toFixed(2) || 'N/A'}</td>
@@ -110,7 +109,7 @@ const StockTable = () => {
 
       </tbody>
     </table>
-    <StockModal stock={selectedStock} onClose={closeModal}/>
+    <StockModal stock={selectedStock} symbol={selectedStock?.symbol}  onClose={closeModal}/>
     </>
   );
 };
