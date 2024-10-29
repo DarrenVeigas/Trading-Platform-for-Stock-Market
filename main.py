@@ -6,7 +6,7 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 from pydantic import BaseModel, EmailStr
-
+from db_helper_new import gen,read_symbol
 # Load environment variables
 load_dotenv()
 
@@ -106,6 +106,25 @@ async def login(request: Request):
 
     raise HTTPException(status_code=400, detail="Invalid email or password")
 
+@app.post("/dashboard")
+async def dashboard():
+    try:
+        # Call the function with additional logging
+        result=gen()
+        if result is None:
+            print("No data found for 'PLUG'. Check database.")
+            raise HTTPException(status_code=404, detail="No data found for 'PLUG'")
+        print("Data retrieved successfully:", result)
+        
+        return JSONResponse(content={"data": result, "message": "Dashboard data retrieved successfully!"})
+    
+    except mysql.connector.Error as db_error:
+        print(f"Database error occurred: {db_error}")
+        raise HTTPException(status_code=500, detail=f"Database error: {str(db_error)}")
+    
+    except Exception as e:
+        print(f"Unexpected error in /dashboard endpoint: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch dashboard data: {str(e)}")
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
