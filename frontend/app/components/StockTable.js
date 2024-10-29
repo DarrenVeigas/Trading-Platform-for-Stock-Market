@@ -1,10 +1,11 @@
 "use client"; 
 import React, { useEffect, useState } from 'react';
 import styles from '../styles/StockTable.module.css';
+import StockModal from './StockModal';
 
 const StockTable = () => {
   const [stocksData, setStocksData] = useState(null);
-
+  const [selectedStock, setSelectedStock] = useState(null);
   useEffect(() => {
     async function fetchStocksData() {
       try {
@@ -23,8 +24,60 @@ const StockTable = () => {
   if (!stocksData) {
     return <p>Loading...</p>;
   }
+  const handleStockClick = (stock) => {
+    setSelectedStock(stock);
+  };
 
+  const closeModal = () => {
+  setSelectedStock(null);
+   };
+//   const mockStocksData = [
+//   {
+//     symbol: 'AAPL',
+//     name: 'Apple Inc.',
+//     open: 175.5,
+//     close: 177.0,
+//   },
+//   {
+//     symbol: 'MSFT',
+//     name: 'Microsoft Corp.',
+//     open: 311.2,
+//     close: 310.0,
+//   },
+//   {
+//     symbol: 'GOOGL',
+//     name: 'Alphabet Inc.',
+//     open: 2735.45,
+//     close: 2740.0,
+//   },
+//   {
+//     symbol: 'AMZN',
+//     name: 'Amazon.com Inc.',
+//     open: 3345.0,
+//     close: 3350.0,
+//   },
+//   {
+//     symbol: 'TSLA',
+//     name: 'Tesla Inc.',
+//     open: 780.0,
+//     close: 785.0,
+//   },
+//   // Add more mock data as needed
+// ];
+
+// const StockTable = () => {
+//   const [stocksData, setStocksData] = useState(mockStocksData);
+//   const [selectedStock, setSelectedStock] = useState(null);
+
+//   const handleStockClick = (stock) => {
+//     setSelectedStock(stock);
+//   };
+
+//   const closeModal = () => {
+//     setSelectedStock(null);
+//   };
   return (
+    <>
     <table className={styles.stockTable}>
       <thead>
         <tr>
@@ -39,7 +92,7 @@ const StockTable = () => {
       </thead>
       <tbody>
         {Object.entries(stocksData).map(([symbol, stock], index) => (
-          <tr key={index}>
+          <tr key={index} onClick={() => handleStockClick(stock)}>
             <td>{symbol}</td>
             <td>{stock.name || 'N/A'}</td> {/* Add stock name if available */}
             <td>${stock.open?.toFixed(2) || 'N/A'}</td>
@@ -54,8 +107,11 @@ const StockTable = () => {
             <td>{stock.volume || 'N/A'}</td>
           </tr>
         ))}
+
       </tbody>
     </table>
+    <StockModal stock={selectedStock} onClose={closeModal}/>
+    </>
   );
 };
 

@@ -11,7 +11,7 @@ config = {
     'Content-Type': 'application/json'
 
 }
-api_key=os.getenv('tAPI_KEY')
+api_key=os.getenv('tAPI_KEY1')
 
 us_symbols=['PLUG', 'NKE', 'CRWD', 'ZM', 'NTES', 'MELI', 'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'BRK-B', 'TSLA']
 
