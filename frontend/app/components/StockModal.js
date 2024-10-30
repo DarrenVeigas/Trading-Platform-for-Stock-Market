@@ -76,13 +76,13 @@ const StockModal = ({ stock, symbol,onClose }) => {
           <div className={styles.actionButtons}>
           <button 
             onClick={() => handleActionClick('buy')}
-            className={`${styles.actionButton} ${action === 'buy' ? styles.activeButton : ''}`}
+            className={`${styles.actionButton} ${action === 'buy' ? styles.buyActive : ''}`}
           >
             Buy
           </button>
           <button 
             onClick={() => handleActionClick('sell')}
-            className={`${styles.actionButton} ${action === 'sell' ? styles.activeButton : ''}`}
+            className={`${styles.actionButton} ${action === 'sell' ? styles.sellActive : ''}`}
           >
             Sell
           </button>

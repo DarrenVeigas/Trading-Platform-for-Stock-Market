@@ -1,0 +1,67 @@
+.manageFundsContainer {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .formContainer {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .formContainer label {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .formContainer input {
+    padding: 10px;
+    width: 200px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    text-align: right;
+  }
+  
+  .buttonContainer {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .holdButton {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .releaseButton {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .transactionTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .transactionTable th, .transactionTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .transactionTable th {
+    background-color: #f2f2f2;
+  }
+  

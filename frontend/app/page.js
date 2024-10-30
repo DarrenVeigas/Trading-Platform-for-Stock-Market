@@ -15,6 +15,9 @@ export default function Home() {
           <li>
             <Link href="/dashboard">Dashboard</Link>
           </li>
+          <li>
+            <Link href="/managefunds">Manage Funds</Link>
+          </li>
         </ul>
       </nav>
     </div>

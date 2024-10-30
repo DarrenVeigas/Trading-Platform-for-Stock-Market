@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Query
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector
@@ -6,7 +6,7 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 from pydantic import BaseModel, EmailStr
-from db_helper_new import gen,read_symbol
+from db_helper_new import gen,get_wallet,hold
 # Load environment variables
 load_dotenv()
 
@@ -125,6 +125,31 @@ async def dashboard():
     except Exception as e:
         print(f"Unexpected error in /dashboard endpoint: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch dashboard data: {str(e)}")
+    
+
+@app.post("/transactions")
+async def transactions(userId:str ):
+    try:
+        if not userId:
+            raise HTTPException(status_code=422, detail=userId)
+        transactions = get_wallet(userId)
+        return JSONResponse(content={"transactions": transactions[:-1],'amount':transactions[-1]})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error retrieving transactions.")
+    
+class FundRequest(BaseModel):
+    userId: str
+    amount: float
+    type: str
+
+@app.post("/holdFunds")
+async def transactions(request: FundRequest):
+    try:
+        transactions = hold(request.userId,request.amount,request.type)
+        return JSONResponse(content={"transactions": transactions})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error retrieving transactions.")
+    
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

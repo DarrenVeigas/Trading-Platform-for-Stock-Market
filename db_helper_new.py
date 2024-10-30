@@ -132,3 +132,26 @@ def read_symbol(symbol):
     cursor.close()
     conn.close()
     return d
+
+
+def get_wallet(userId):
+    cursor,conn=new_connect()
+    cursor.execute('''select id,type,changes,wallet_balance from users,wallet where users.id=wallet.u_id and email=%s''',(userId,))
+    rec=cursor.fetchall()
+    d=[]
+    for i in rec:
+        d.append({'id':i[0],'type':i[1],'amount':i[2]})
+    d.append(i[3])
+    cursor.close()
+    conn.close()
+    return d
+
+def hold(userId,amount,type):
+    cursor,conn=new_connect()
+    cursor.execute('''select id from users where email=%s''',(userId,))
+    rec=cursor.fetchone()[0]
+    cursor.callproc('UpdateWalletBalance', [rec, amount, type])
+
+    cursor.close()
+    conn.close()
+
