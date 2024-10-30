@@ -1,4 +1,5 @@
 "use client"; 
+import { useRouter } from 'next/navigation';
 
 // // pages/stocks.js
 // import React from 'react';
@@ -41,10 +42,17 @@ const DashboardPage = () => {
     }
   }, []);
   console.log(userId)
+  const router = useRouter();
+
+  const handleClick = () => {
+    // Run any other functions here if needed
+    router.push('/managefunds');
+  };
   return (
     <div className={styles.dashboardContainer}>
       <header className={styles.header}>
         <h1>Stock Dashboard</h1>
+        <button onClick={handleClick}>Manage Funds</button>
         <input type="text" placeholder="Search stocks..." className={styles.searchBar} />
         <div className={styles.filters}>
           <select className={styles.filter}>
