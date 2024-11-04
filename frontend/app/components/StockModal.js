@@ -94,43 +94,17 @@ const StockModal = ({ stock, symbol, onClose }) => {
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={handleOutsideClick}>
+    <div className={styles.modalOverlay} onClick={() => onClose()}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <h2>{symbol}</h2>
-        <p>Symbol: {symbol}</p>
-        <p>Open Price: ${stock.open.toFixed(2)}</p>
-        <p>Close Price: ${stock.close.toFixed(2)}</p>
-        <p>High: ${stock.high?.toFixed(2) || 'N/A'}</p>
-        <p>Low: ${stock.low?.toFixed(2) || 'N/A'}</p>
-        <p>Price: ${stock.price?.toFixed(2) || 'N/A'}</p>
 
-        <div className={styles.inputContainer}>
-          <label>
-            Quantity:
-            <input
-              type="number"
-              min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className={styles.inputField}
-            />
-          </label>
-          <label>
-              Price:
-              <input
-                type="text"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className={styles.inputField}
-              />
-            </label>
-        </div>
+        {/* Render stock information and Buy/Sell/Close buttons above the graph */}
+        <div className={styles.infoTopSection}>
 
-        <div className={styles.chartContainer}>
-          <Line data={chartData} options={chartOptions} />
-        </div>
+          <p>Price: ${stock.price?.toFixed(2) || 'N/A'}</p>
 
-        <div className={styles.buttonContainer}>
+          {/* Buy, Sell, and Close buttons */}
+          <div className={styles.buttonContainer}>
           <div className={styles.actionButtons}>
             <button
               onClick={() => handleActionClick('buy')}
@@ -144,15 +118,45 @@ const StockModal = ({ stock, symbol, onClose }) => {
             >
               Sell
             </button>
+            </div>
           </div>
-          <button onClick={onClose}>Close</button>
         </div>
-        <div>
-          <button onClick={handleProceedClick} className={styles.proceedButton}>Proceed</button>
+
+        <div className={styles.chartContainer}>
+          <Line 
+            data={chartData} 
+            options={chartOptions} 
+            height={300}  // Adjust as needed
+            width={1100}   // Adjust as needed
+          />
+        </div>
+
+        <div className={styles.inputProceedContainer}>
+          <div className={styles.inputContainer}>
+            <label>
+              Quantity:
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className={styles.inputField}
+              />
+            </label>
+            <label>
+              Price:
+              <input
+                type="text"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className={styles.inputField}
+              />
+            </label>
+          </div>
+          <button onClick={handleProceedClick} className={styles.proceed}>Proceed</button>
         </div>
       </div>
     </div>
   );
 };
-
 export default StockModal;

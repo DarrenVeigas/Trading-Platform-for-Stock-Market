@@ -2,29 +2,40 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
     z-index: 1000;
   }
   
   .modalContent {
+    display: flex;
+    flex-direction: column;
+    width: 90vw; /* Responsive width */
+    max-width: 90%; /* Responsive max width */
+    max-height: 90vh; /* Limit height for smaller screens */
     background: white;
     padding: 20px;
     border-radius: 5px;
-    width: 300px;
+    margin: auto;
+    overflow-y: auto; /* Enable scrolling for overflow content */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .inputProceedContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
   }
   
   .inputContainer {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
     gap: 10px;
-    margin-top: 20px;
   }
   
   .inputField {
@@ -32,10 +43,34 @@
     width: 80px;
     padding: 5px;
   }
-  
+  .flexContainer {
+    display: flex;
+    gap: 20px;
+  }
+
+  .infoTopSection {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+
+  .infoSection {
+  flex: 1;
+  }
+
+  .chartSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chartContainer {
+    margin: 20px 0;
+    height: 300px; /* Adjust height for responsiveness */
+    max-height: 40vh; /* Responsive max height for the chart */
+    }
   .buttonContainer {
     display: flex;
-    justify-content: flex-end;
     gap: 10px;
     margin-top: 20px;
   }
@@ -52,6 +87,13 @@
   .button:hover {
     background-color: #0056b3;
   }
+
+  .active {
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+  }
+
   .actionButton {
     padding: 10px 20px;
     cursor: pointer;

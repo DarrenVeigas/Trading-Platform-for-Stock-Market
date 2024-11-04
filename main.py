@@ -10,7 +10,7 @@ from db_helper_new import gen,get_wallet,hold
 from datetime import datetime,timedelta
 # Load environment variables
 load_dotenv()
-api_key=os.getenv('tAPI_KEY')
+api_key=os.getenv('tAPI_KEY1')
 # Database configuration
 now = datetime.now()
 
@@ -132,7 +132,6 @@ async def dashboard():
         if result is None:
             print("No data found for 'PLUG'. Check database.")
             raise HTTPException(status_code=404, detail="No data found for 'PLUG'")
-        print("Data retrieved successfully:", result)
         
         return JSONResponse(content={"data": result, "message": "Dashboard data retrieved successfully!"})
     
