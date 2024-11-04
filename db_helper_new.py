@@ -11,17 +11,22 @@ config = {
     'Content-Type': 'application/json'
 
 }
-api_key=os.getenv('tAPI_KEY1')
+api_key=os.getenv('tAPI_KEY')
 
 us_symbols=['PLUG', 'NKE', 'CRWD', 'ZM', 'NTES', 'MELI', 'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'BRK-B', 'TSLA']
 
-
 now = datetime.now()
-year = now.year
-month = now.month
-day = now.day-1
 
-date=f"{year}-{month:02}-{day:02}"
+if now.weekday() == 0:  
+    target_date = now - timedelta(days=3)  
+else:
+    target_date = now - timedelta(days=1)  
+
+year = target_date.year
+month = target_date.month
+day = target_date.day
+
+date = f"{year}-{month:02}-{day:02}"
 
 def new_connect():
     db_connection = mysql.connect(

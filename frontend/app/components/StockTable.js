@@ -108,8 +108,10 @@ const StockTable = () => {
 
       </tbody>
     </table>
-    <StockModal stock={selectedStock} symbol={selectedStock?.symbol}  onClose={closeModal}/>
-    </>
+    {selectedStock && (
+      <StockModal stock={selectedStock} symbol={selectedStock?.symbol} onClose={closeModal} />
+      )}    
+      </>
   );
 };
 

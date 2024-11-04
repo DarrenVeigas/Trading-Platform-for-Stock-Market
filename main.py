@@ -3,14 +3,32 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector
 #from mysql.connector import Error
-import os
+import os,requests
 from dotenv import load_dotenv
 from pydantic import BaseModel, EmailStr
 from db_helper_new import gen,get_wallet,hold
+from datetime import datetime,timedelta
 # Load environment variables
 load_dotenv()
-
+api_key=os.getenv('tAPI_KEY')
 # Database configuration
+now = datetime.now()
+
+if now.weekday() == 0:  
+    target_date = now - timedelta(days=3)  
+else:
+    target_date = now - timedelta(days=1)  
+
+year = target_date.year
+month = target_date.month
+day = target_date.day
+
+date = f"{year}-{month:02}-{day:02}"
+final=now-timedelta(days=365*5)
+year = final.year
+month = final.month
+day = final.day
+final=f"{year}-{month:02}-{day:02}"
 DATABASE_CONFIG = {
     'user': os.getenv('DB_USER'),
     'password': os.getenv('DB_PASSWORD'),
@@ -149,7 +167,25 @@ async def transactions(request: FundRequest):
         return JSONResponse(content={"transactions": transactions})
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error retrieving transactions.")
-    
+
+
+@app.get("/fetch_stock_data/")
+async def fetch_stock_data(symbol: str):
+    if not symbol:
+        raise HTTPException(status_code=400, detail="Symbol is required")
+
+    url = f"https://api.tiingo.com/tiingo/daily/{symbol}/prices?startDate={final}&endDate={date}"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Token {api_key}",
+    }
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail="Failed to fetch data from Tiingo")
+
+    return response.json()
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
