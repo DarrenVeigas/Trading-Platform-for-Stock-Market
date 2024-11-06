@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns'; // Import date adapter
 import styles from '../styles/StockModel.module.css';
+import { toast ,ToastContainer} from 'react-toastify';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -12,6 +13,12 @@ const StockModal = ({ stock, symbol, onClose }) => {
   const [price, setPrice] = useState(stock ? stock.price : 0);
   const [action, setAction] = useState(null);
   const [historicalData, setHistoricalData] = useState([]);
+  const [modalSymbol, setModalSymbol] = useState(symbol);
+  const [email, setEmail] = useState(null);
+
+  useEffect(() => {
+    setModalSymbol(symbol); // Update modalSymbol when symbol prop changes
+}, [symbol]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -27,6 +34,14 @@ const StockModal = ({ stock, symbol, onClose }) => {
   }, [onClose]);
 
   useEffect(() => {
+    // Retrieve email from local storage
+    const storedEmail = localStorage.getItem('userId'); 
+    if (storedEmail) {
+        setEmail(storedEmail); // Save the email in state
+    }
+}, []);
+
+  useEffect(() => {
     // Fetch historical data for the stock
     const fetchStockData = async () => {
       try {
@@ -36,6 +51,15 @@ const StockModal = ({ stock, symbol, onClose }) => {
         
       } catch (error) {
         console.error("Error fetching stock data:", error);
+        toast.error('Coulld not render the stocks', {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       }
     };
 
@@ -54,12 +78,44 @@ const StockModal = ({ stock, symbol, onClose }) => {
     setAction(selectedAction);
   };
 
-  const handleProceedClick = () => {
+  const handleProceedClick = async() => {
     if (!action) {
-      alert("Please select 'Buy' or 'Sell' before proceeding.");
+      toast.warn("Please select 'Buy' or 'Sell' before proceeding.");
       return;
     }
-    console.log(`Action: ${action}, Quantity: ${quantity}, Price: ${price}`);
+    const orderDetails = {
+      u_id: email, // Use the email state variable
+      price: parseFloat(price),
+      quantity: parseInt(quantity, 10),
+      symbol: modalSymbol,
+      action: action,
+      time: new Date().toISOString(),  // Ensure this is a valid date string
+  };
+
+  console.log("Order Details:", orderDetails); // Log for debugging
+
+  try {
+      // Send order details to backend
+      const response = await fetch('http://localhost:8000/orders', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderDetails),
+      });
+
+      if (response.ok) {
+          const data = await response.json();
+          toast.success('Order processed successfully!');
+        } else {
+          const errorData = await response.json();
+          toast.error(`Failed to create order: ${errorData.detail}`);
+          console.error("Error details:", errorData);
+      }
+  } catch (error) {
+    toast.error('Error creating order. Please try again later.');
+    console.error("Network error:", error);;
+  }
     onClose();
   };
 
@@ -94,16 +150,23 @@ const StockModal = ({ stock, symbol, onClose }) => {
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={() => onClose()}>
+    <div className={styles.modalOverlay} onClick={handleOutsideClick}>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        progress={undefined}
+      />
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <h2>{symbol}</h2>
 
-        {/* Render stock information and Buy/Sell/Close buttons above the graph */}
         <div className={styles.infoTopSection}>
 
           <p>Price: ${stock.price?.toFixed(2) || 'N/A'}</p>
 
-          {/* Buy, Sell, and Close buttons */}
           <div className={styles.buttonContainer}>
           <div className={styles.actionButtons}>
             <button

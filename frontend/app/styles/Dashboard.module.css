@@ -6,19 +6,62 @@
   
   .header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    gap: 15px;
   }
   
-  .searchBar {
-    width: 200px;
-    padding: 8px;
+  .logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: #333;
+    margin-right: 20px;
+  }
+  
+  .navButtons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .navButton {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #fdfefe;
+    color: #050505;
     font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
   
+  .navButton:hover {
+    background-color: #e0e1e3;
+  }
+  
+  .leftSection {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-grow: 1; /* Take up available space to push other elements to the right */
+  }
+  /* Search bar styling */
+  .searchBar {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    width: 200px;
+    outline: none;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .searchBar:focus {
+    box-shadow: 0 0 5px rgba(0, 112, 243, 0.5);
+    border-color: #0070f3;
+  }
+  
+  /* Filters container styling */
   .filters {
     display: flex;
     gap: 10px;
@@ -26,10 +69,33 @@
   
   .filter {
     padding: 8px;
+    border-radius: 5px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    background-color: #ffffff;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
   
+  .filter:hover {
+    background-color: #eaeaea;
+  }
+  
+  .logoutButton {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff4d4d;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: auto; /* Pushes logout button to the far right */
+
+  }
+  
+  .logoutButton:hover {
+    background-color: #cc0000;
+  }
   .mainContent {
     overflow-x: auto;
   }

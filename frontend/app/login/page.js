@@ -1,8 +1,10 @@
-"use client";  // Add this line at the top
+"use client";  
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; 
 import Head from 'next/head';
+import { toast,ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -24,11 +26,19 @@ export default function Login() {
     });
 
     const data = await response.json();
-    setMessage(data.message || 'Invalid Email or Password');
+    toast.error(data.message || 'Invalid Email or Password', {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
 
     if (response.ok) {
       localStorage.setItem('userId', email); // Adjust based on your API response
-
+      
       setTimeout(() => {
         router.push('/dashboard'); // Redirect to home page after successful login
       }, 2000);
@@ -41,6 +51,7 @@ export default function Login() {
         <title>Login</title>
         <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/295/295128.png" />
       </Head>
+      <ToastContainer />
       <form onSubmit={handleSubmit} className="form-container mt-5">
         <div className="row text-center">
           <i className="fa fa-user-circle-o fa-3x mt-1 mb-2"></i>

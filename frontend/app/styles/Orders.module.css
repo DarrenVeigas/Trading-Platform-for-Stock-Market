@@ -1,0 +1,47 @@
+/* Container Styles */
+.container {
+    max-width: 800px; /* Limit the width of the orders section */
+    margin: 20px auto; /* Center the container */
+    padding: 20px; /* Add padding for better spacing */
+    background-color: #f9f9f9; /* Light background color for contrast */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Heading Style */
+.title {
+    font-size: 24px; /* Font size for the main heading */
+    margin-bottom: 20px; /* Space below the heading */
+}
+
+/* Error Message Style */
+.error {
+    color: red; /* Red color for error messages */
+    margin: 10px 0; /* Space around the error message */
+}
+
+/* Order List Styles */
+.orderList {
+    list-style-type: none; /* Remove default list styles */
+    padding: 0; /* Remove default padding */
+}
+
+/* Individual Order Item Styles */
+.orderItem {
+    background-color: white; /* White background for each order */
+    padding: 15px; /* Padding for each order */
+    border: 1px solid #e0e0e0; /* Light border for separation */
+    border-radius: 4px; /* Rounded corners */
+    margin-bottom: 10px; /* Space between order items */
+    transition: box-shadow 0.2s; /* Transition effect for hover */
+}
+
+/* Hover effect for order items */
+.orderItem:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow on hover */
+}
+
+/* Paragraph Style */
+.orderItem p {
+    margin: 5px 0; /* Space around paragraphs */
+}

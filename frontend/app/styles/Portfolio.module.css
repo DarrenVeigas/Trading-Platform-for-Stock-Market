@@ -1,0 +1,47 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    font-size: 2em;
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.error {
+    color: #d9534f;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.portfolioList {
+    list-style-type: none;
+    padding: 0;
+}
+
+.portfolioItem {
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.portfolioItem p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #333;
+}
+
+.portfolioItem p:first-child {
+    font-weight: bold;
+    color: #0070f3; /* Accent color for symbol */
+}

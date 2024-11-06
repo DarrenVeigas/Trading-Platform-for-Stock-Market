@@ -1,13 +1,10 @@
 'use client';
 import React, { useState,useEffect } from 'react';
 import styles from '../styles/ManageFunds.module.css';
-
-const mockTransactions = [
-  { id: 1, type: 'Hold', amount: 500, date: '2024-10-01' },
-  { id: 2, type: 'Release', amount: 200, date: '2024-10-15' },
-  { id: 3, type: 'Hold', amount: 300, date: '2024-10-20' },
-  // Add more mock transactions as needed
-];
+import { useRouter } from 'next/navigation';
+import Navbar from '../components/Navbar';
+import { toast,ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ManageFunds = () => {
   const [amount, setAmount] = useState('');
@@ -33,7 +30,7 @@ const ManageFunds = () => {
       settotal(data.amount)
       console.log(data)
     } catch (error) {
-      console.error("Error fetching transactions:", error);
+        console.error("Error fetching transactions:", error);
     }
   };
 
@@ -45,7 +42,8 @@ const ManageFunds = () => {
 
   const handleHoldFunds = async(type) => {
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-        alert('Please enter a valid amount.');
+      toast.error("Amount entered is invalid");
+
         return;
       }
     try {
@@ -56,23 +54,59 @@ const ManageFunds = () => {
           body: JSON.stringify({ userId,  amount: parseFloat(amount),type})
         });
         if (!response.ok) {
-            // If the response status is 500, show the alert
+
             if (response.status === 500) {
-              alert('You have low account balance');
+              toast.error('You have low account balance')
             }}
         const result = await response.json();
         
         if (result.message) {
-          alert(result.message);
+          toast.success('Transaction completed successfully');
           fetchTransactions();  // Refresh transaction history
         }
       } catch (error) {
+        toast.error('Error processing funds')
         console.error(`Error processing ${type} funds:`, error);
     }
   };
 
+  const router = useRouter();
 
+    const handleClick = () => {
+
+        router.push('/managefunds');
+      };
+      const handleOrderHistoryClick=()=>{
+        router.push('/orders')
+      }
+    
+      const handlePortfolio=()=>{
+        router.push('/portfolio')
+      }
+    
+      const handleLogout=()=>{
+        localStorage.removeItem("userid");
+        router.push('/login')
+      }
   return (
+    <div>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        progress={undefined}
+      />
+        <div className={styles.dashboardContainer}>
+            <Navbar 
+            handleClick={handleClick} 
+            handleOrderHistoryClick={handleOrderHistoryClick} 
+            handlePortfolio={handlePortfolio} 
+            handleLogout={handleLogout} 
+            />
+        </div>
     <div className={styles.manageFundsContainer}>
       <h1>Manage Funds</h1>
       
@@ -119,6 +153,7 @@ const ManageFunds = () => {
     </tbody>
   </table>
 )}
+    </div>
     </div>
   );
 };

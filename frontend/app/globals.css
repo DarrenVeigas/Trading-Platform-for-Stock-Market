@@ -25,3 +25,6 @@ body {
     text-wrap: balance;
   }
 }
+.Toastify__toast-container {
+  z-index: 9999; /* Make sure it's on top of other elements */
+}
