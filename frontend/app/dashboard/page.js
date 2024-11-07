@@ -20,13 +20,15 @@ const DashboardPage = () => {
   const router = useRouter();
 
   const handleClick = () => {
-    // Run any other functions here if needed
+
     router.push('/managefunds');
   };
   const handleOrderHistoryClick=()=>{
     router.push('/orders')
   }
-
+  const handleTradeHistoryClick=()=>{
+    router.push('/trades')
+  }
   const handlePortfolio=()=>{
     router.push('/portfolio')
   }
@@ -34,7 +36,12 @@ const DashboardPage = () => {
   const handleLogout=()=>{
     localStorage.removeItem("userid");
     router.push('/login')
-  }
+    }
+
+const handleBookedPL=()=>{
+  router.push('/bookpl')
+    }
+
   return (
     <div className={styles.dashboardContainer}>
       <ToastContainer
@@ -47,11 +54,13 @@ const DashboardPage = () => {
         progress={undefined}
       />
       <Navbar 
-        handleClick={handleClick} 
-        handleOrderHistoryClick={handleOrderHistoryClick} 
-        handlePortfolio={handlePortfolio} 
-        handleLogout={handleLogout} 
-      />
+            handleClick={handleClick} 
+            handleOrderHistoryClick={handleOrderHistoryClick} 
+            handlePortfolio={handlePortfolio} 
+            handleLogout={handleLogout} 
+            handleTradeHistoryClick={handleTradeHistoryClick}
+            handleBookedPL={handleBookedPL}
+            />
       <main className={styles.mainContent}>
         <StockTable />
       </main>

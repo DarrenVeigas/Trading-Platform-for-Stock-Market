@@ -44,10 +44,9 @@ export default function Orders() {
         localStorage.removeItem("userid");
         }
 
-
     const fetchOrders = async (userEmail) => {
         try {
-            const response = await fetch(`http://localhost:8000/orders?userId=${userEmail}`, {
+            const response = await fetch(`http://localhost:8000/trades?userId=${userEmail}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,7 +74,7 @@ export default function Orders() {
     return (
         <div>
         <div className={styles.dashboardContainer}>
-        <Navbar 
+            <Navbar 
             handleClick={handleClick} 
             handleOrderHistoryClick={handleOrderHistoryClick} 
             handlePortfolio={handlePortfolio} 
@@ -87,7 +86,7 @@ export default function Orders() {
         </div>
       <div className={styles.container}>
         
-          <h1 className={styles.title}>Your Order History</h1>
+          <h1 className={styles.title}>Your Trade History</h1>
           {error && <p className={styles.error}>{error}</p>}
           <ul className={styles.orderList}>
               {orderHistory.length > 0 ? (

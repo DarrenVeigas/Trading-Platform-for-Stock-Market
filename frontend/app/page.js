@@ -22,10 +22,16 @@ export default function Home() {
             <Link href="/managefunds">Manage Funds</Link>
           </li>
           <li>
-            <Link href="/orders">Order History</Link>
+            <Link href="/orders">Order Book</Link>
           </li>
           <li>
             <Link href="/portfolio">Portfolio</Link>
+          </li>
+          <li>
+            <Link href="/trades">Trade Book</Link>
+          </li>
+          <li>
+            <Link href="/bookPL">Book P/L</Link>
           </li>
         </ul>
       </nav>

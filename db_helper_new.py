@@ -160,3 +160,60 @@ def hold(userId,amount,type):
     cursor.close()
     conn.close()
 
+def calculate_realized_profit_loss(user_id):
+    try:
+        # Establish the database connection
+        cursor,connection = new_connect()
+        query = """
+        WITH CTE_Buy_Summary AS (
+            SELECT
+                symbol,
+                u_id,
+                SUM(quantity) AS total_bought_quantity,
+                SUM(quantity * price) AS total_bought_amount
+            FROM
+                order_history
+            WHERE
+                action = 'buy'
+            GROUP BY
+                symbol, u_id
+        ),
+        CTE_Sell_Summary AS (
+            SELECT
+                symbol,
+                u_id,
+                SUM(quantity) AS total_sold_quantity,
+                SUM(quantity * price) AS total_sold_amount
+            FROM
+                order_history
+            WHERE
+                action = 'sell'
+            GROUP BY
+                symbol, u_id
+        )
+        SELECT
+            s.symbol,
+            s.u_id,
+            s.total_sold_amount - (b.total_bought_amount / b.total_bought_quantity * s.total_sold_quantity) AS realized_profit_loss
+        FROM
+            CTE_Sell_Summary s
+        JOIN
+            CTE_Buy_Summary b ON s.symbol = b.symbol AND s.u_id = b.u_id
+        WHERE
+            s.u_id = %s;
+        """
+
+        cursor.execute(query, (user_id,))
+        result = cursor.fetchall()
+        realized_profit_loss_map = {row[0]: row[2] for row in result}  # row[0] is symbol, row[2] is realized_profit_loss
+        return realized_profit_loss_map
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+            print("Database connection closed")

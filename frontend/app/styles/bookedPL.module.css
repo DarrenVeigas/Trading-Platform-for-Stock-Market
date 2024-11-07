@@ -1,0 +1,44 @@
+.booked-pl-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.booked-pl-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.booked-pl-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.booked-pl-card:hover {
+    transform: translateY(-5px);
+}
+
+.booked-pl-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.booked-pl-card p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.profit {
+    color: green;
+}
+
+.loss {
+    color: red;
+}

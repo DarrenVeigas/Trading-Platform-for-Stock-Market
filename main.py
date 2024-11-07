@@ -5,7 +5,7 @@ import mysql.connector
 import os,requests
 from dotenv import load_dotenv
 from pydantic import BaseModel, EmailStr
-from db_helper_new import gen,get_wallet,hold
+from db_helper_new import gen,get_wallet,hold,calculate_realized_profit_loss
 from datetime import datetime,timedelta
 
 load_dotenv()
@@ -124,7 +124,7 @@ async def login(request: Request):
 @app.post("/dashboard")
 async def dashboard():
     try:
-        # Call the function with additional logging
+
         result=gen()
         if result is None:
             print("No data found for 'PLUG'. Check database.")
@@ -293,66 +293,105 @@ class UserRequest(BaseModel):
 def process_orders(order: UserRequest):
     UserId = order.UserId
     print(f"Received UserId: {UserId}")  # Log the received UserId
-    connection = create_connection()
+    '''connection = create_connection()
     if connection is None:
-        raise HTTPException(status_code=500, detail="Database connection failed")
+        raise HTTPException(status_code=500, detail="Database connection failed")'''
 
     try:
-        with connection.cursor(dictionary=True) as cursor:
-            # First, retrieve the user ID from the email (order.u_id is the email)
-            cursor.execute("SELECT id FROM users WHERE email = %s", (UserId,))
-            user = cursor.fetchone()  # Fetch the single user record   
+        with create_connection() as connection:
 
-        if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
+            with connection.cursor(dictionary=True) as cursor:
 
-        user_id = user['id']  
-        print(f"User ID: {user_id}")
+                cursor.execute("SELECT id FROM users WHERE email = %s", (UserId,))
+                user = cursor.fetchone()  # Fetch the single user record   
 
-        with connection.cursor(dictionary=True) as cursor:  
-            query = """
-            SELECT 
-                symbol,
-                u_id,
-                SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity,
-                SUM(CASE WHEN action = 'buy' THEN quantity * price ELSE -quantity * price END) AS total_amt_invst
-            FROM order_history
-            WHERE u_id = %s
-            GROUP BY symbol, u_id;
-            """
-            cursor.execute(query, (user_id,))
-            aggregated_data = cursor.fetchall()
+            if user is None:
+                raise HTTPException(status_code=404, detail="User not found")
 
-            # If no data is found, handle it
-            if not aggregated_data:
-                return {"message": "No portfolio data found for this user."}
+            user_id = user['id']  
+            print(f"User ID: {user_id}")
+
+            with connection.cursor(dictionary=True) as cursor:  
+                query = """
+                SELECT 
+                    symbol,
+                    u_id,
+                    SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity,
+                    SUM(CASE WHEN action = 'buy' THEN quantity * price ELSE -quantity * price END) AS total_amt_invst
+                FROM order_history
+                WHERE u_id = %s
+                GROUP BY symbol, u_id
+                HAVING total_quantity >0;
+                """
+                cursor.execute(query, (user_id,))
+                aggregated_data = cursor.fetchall()
+                print(aggregated_data)
+        if not aggregated_data:
+            return {"message": "No portfolio data found for this user."}
+        
+        realized_profit_loss_map = calculate_realized_profit_loss(user_id)
+
+        with create_connection() as connection:
+
+            with connection.cursor(dictionary=True) as cursor:
+                unrealized_pl_query = """
+                SELECT
+                    p.symbol,
+                    p.user_id,
+                    p.quantity,
+                    p.avg_cp,
+                    sd.price AS current_price,
+                    (p.quantity * (sd.price - p.avg_cp)) AS unrealized_profit_loss
+                FROM portfolio p
+                JOIN stock_data sd ON p.symbol = sd.symbol
+                WHERE p.user_id = %s;
+                """
+                cursor.execute(unrealized_pl_query, (user_id,))
+                unrealized_pl_data = cursor.fetchall()
+                unrealized_pl_map = {
+                    row['symbol']: {
+                        'avg_cp': row['avg_cp'],
+                        'unrealized_profit_loss': row['unrealized_profit_loss']
+                    }
+                    for row in unrealized_pl_data
+                }       
+            for row in aggregated_data:
+                symbol = row['symbol']
+                row['realized_profit_loss'] = realized_profit_loss_map.get(symbol, 0)
+                
+                # Fetch the corresponding unrealized P/L and avg_cp from unrealized_pl_map
+                unrealized_data = unrealized_pl_map.get(symbol, {})
+                row['unrealized_profit_loss'] = unrealized_data.get('unrealized_profit_loss', 0)
+                row['avg_cp'] = unrealized_data.get('avg_cp', 0)
 
             for row in aggregated_data:
                 symbol = row['symbol']  
                 total_quantity = row['total_quantity']
                 total_amt_invst = row['total_amt_invst']
+                if total_quantity == 0:
+                    continue
+                avg_cost=total_amt_invst/total_quantity
+            
+                with connection.cursor(dictionary=True) as cursor:
+                    cursor.execute("SELECT * FROM portfolio WHERE user_id = %s AND symbol = %s", (user_id, symbol))
+                    existing_portfolio = cursor.fetchone()
 
-                cursor.execute("""SELECT * FROM portfolio WHERE user_id = %s AND symbol = %s""", (user_id, symbol))
-                existing_portfolio = cursor.fetchone()
+                with connection.cursor(dictionary=True) as cursor:
+                    if existing_portfolio:
+                        cursor.execute(
+                            "UPDATE portfolio SET quantity = %s, avg_cp = %s WHERE user_id = %s AND symbol = %s",
+                            (total_quantity, avg_cost, user_id, symbol)
+                        )
+                    else:
+                        cursor.execute(
+                            "INSERT INTO portfolio (symbol, quantity, avg_cp, user_id) VALUES (%s, %s, %s, %s)",
+                        (symbol, total_quantity, avg_cost, user_id)
+                    )
 
-                cursor.execute("SELECT price FROM stock_data WHERE symbol=%s", (symbol,))
-                current_price_result = cursor.fetchone()
-
-                if current_price_result:
-                    current_price = current_price_result['price']
-                    row['current_price'] = current_price
-
-                total_revenue_curr=current_price*float(total_quantity)
-                total_revenue=total_revenue_curr-float(total_amt_invst)
-                row['total_revenue']=total_revenue    
-
-                if existing_portfolio:
-                    cursor.execute("""UPDATE portfolio SET quantity = %s, amt_invst = %s, curr_price=%s, total_revenue=%s WHERE user_id = %s AND symbol = %s""", (total_quantity, total_amt_invst, current_price, total_revenue, user_id, symbol))
-                else:
-                    cursor.execute("""INSERT INTO portfolio (symbol, quantity, amt_invst,curr_price, total_revenue, user_id) VALUES (%s, %s, %s, %s, %s, %s)""", (symbol, total_quantity, total_amt_invst, current_price, total_revenue, user_id))
-
-            connection.commit()
-            return aggregated_data  # Return the aggregated data
+        
+                connection.commit()
+        print(aggregated_data)
+        return aggregated_data
 
     except Exception as e:
         connection.rollback()
@@ -365,7 +404,49 @@ def process_orders(order: UserRequest):
 
     finally:
         connection.close()
+
+@app.post('/trades')
+async def trades(userId):
+    connection = create_connection()
+    if connection is None:
+        raise HTTPException(status_code=500, detail="Database connection failed")
+    try:
+
+        with connection.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT id FROM users WHERE email = %s", (userId,))
+            user = cursor.fetchone()  
+
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")  
+        
+        user_id = user['id']  
+        
+        with connection.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT * FROM order_history WHERE u_id = %s order by o_id desc", (user_id,))
+            orders = cursor.fetchall()
+
+        if orders:
+            for order in orders:
+                order['time'] = order['time'].isoformat()    
+        
+        if orders:
+            return JSONResponse(content={"orders": orders}, status_code=200)
+        else:
+            return JSONResponse(content={"orders": []}, status_code=200)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to fetch orders")
+    finally:
+        connection.close()
+
+@app.post('/bookpl')
+async def bookpl(userId):
+    connection=create_connection()
+    with connection.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT id FROM users WHERE email = %s", (userId,))
+            user = cursor.fetchone()
+    user_id=user['id']  
+    return calculate_realized_profit_loss(user_id)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-

@@ -37,7 +37,7 @@ export default function Orders() {
             }
 
             const data = await response.json();
-
+            console.log(data)
             setPortfolio(data);
 
         } catch (error) {
@@ -55,15 +55,22 @@ export default function Orders() {
       const handleOrderHistoryClick=()=>{
         router.push('/orders')
       }
-    
+      const handleTradeHistoryClick=()=>{
+        router.push('/trades')
+      }
       const handlePortfolio=()=>{
         router.push('/portfolio')
       }
     
       const handleLogout=()=>{
-            localStorage.removeItem("userid");
-            router.push('/login')
-      }
+        localStorage.removeItem("userid");
+        router.push('/login')
+        }
+
+    const handleBookedPL=()=>{
+        localStorage.removeItem("userid");
+        }
+
     return (
         <div>
             <ToastContainer
@@ -76,12 +83,15 @@ export default function Orders() {
         progress={undefined}
       />
             <div className={styles.dashboardContainer}>
-                <Navbar 
-                handleClick={handleClick} 
-                handleOrderHistoryClick={handleOrderHistoryClick} 
-                handlePortfolio={handlePortfolio} 
-                handleLogout={handleLogout} 
-                />
+            <Navbar 
+            handleClick={handleClick} 
+            handleOrderHistoryClick={handleOrderHistoryClick} 
+            handlePortfolio={handlePortfolio} 
+            handleLogout={handleLogout} 
+            handleTradeHistoryClick={handleTradeHistoryClick}
+            handleBookedPL={handleBookedPL}
+
+            />
             </div>
         
         <div className={styles.container}>
@@ -93,9 +103,9 @@ export default function Orders() {
                         <li key={item.symbol} className={styles.orderItem}>
                             <p>Symbol: {item.symbol}</p>
                             <p>Quantity: {item.total_quantity ?? 'N/A'}</p>
-                            <p>Current Price: {item.current_price ? `$${item.current_price.toFixed(2)}` : 'N/A'}</p>
-                            <p>Current Profit/Loss: {item.total_revenue ? `$${item.total_revenue.toFixed(2)}` : 'N/A'}</p>
-                            <p>Total Investment: {item.total_amt_invst ? `$${item.total_amt_invst.toFixed(2)}` : 'N/A'}</p>
+                            <p>Unrealized P/L: {item.unrealized_profit_loss !=null? `$${item.unrealized_profit_loss.toFixed(2)}` : 'N/A'}</p>
+                            <p>Realized P/L: {item.realized_profit_loss != null ? `$${item.realized_profit_loss.toFixed(2)}` : 'N/A'}</p>
+                            <p>Avg CP: {item.avg_cp !=null? `$${item.avg_cp.toFixed(2)}` : 'N/A'}</p>
                         </li>
                     ))
                 ) : (

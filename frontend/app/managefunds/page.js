@@ -72,22 +72,29 @@ const ManageFunds = () => {
 
   const router = useRouter();
 
-    const handleClick = () => {
+  const handleClick = () => {
 
-        router.push('/managefunds');
-      };
-      const handleOrderHistoryClick=()=>{
-        router.push('/orders')
-      }
-    
-      const handlePortfolio=()=>{
-        router.push('/portfolio')
-      }
-    
-      const handleLogout=()=>{
-        localStorage.removeItem("userid");
-        router.push('/login')
-      }
+    router.push('/managefunds');
+  };
+  const handleOrderHistoryClick=()=>{
+    router.push('/orders')
+  }
+  const handleTradeHistoryClick=()=>{
+    router.push('/trades')
+  }
+  const handlePortfolio=()=>{
+    router.push('/portfolio')
+  }
+
+  const handleLogout=()=>{
+    localStorage.removeItem("userid");
+    router.push('/login')
+    }
+
+const handleBookedPL=()=>{
+    router.push('/bookPL')
+    }
+
   return (
     <div>
       <ToastContainer
@@ -100,11 +107,13 @@ const ManageFunds = () => {
         progress={undefined}
       />
         <div className={styles.dashboardContainer}>
-            <Navbar 
+        <Navbar 
             handleClick={handleClick} 
             handleOrderHistoryClick={handleOrderHistoryClick} 
             handlePortfolio={handlePortfolio} 
             handleLogout={handleLogout} 
+            handleTradeHistoryClick={handleTradeHistoryClick}
+            handleBookedPL={handleBookedPL}
             />
         </div>
     <div className={styles.manageFundsContainer}>

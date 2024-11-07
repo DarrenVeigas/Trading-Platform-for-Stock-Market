@@ -1,15 +1,24 @@
 import React from 'react';
 import styles from '../styles/Dashboard.module.css';
 
-const Navbar = ({ handleClick, handleOrderHistoryClick, handlePortfolio, handleLogout }) => {
+const Navbar = ({ 
+  handleClick, 
+  handleOrderHistoryClick, 
+  handlePortfolio, 
+  handleLogout, 
+  handleTradeHistoryClick,
+  handleBookedPL,
+ }) => {
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
         <h1 className={styles.logo}>TradeWave</h1>
         <div className={styles.navButtons}>
-          <button onClick={handleClick} className={styles.navButton}>Manage Funds</button>
-          <button onClick={handleOrderHistoryClick} className={styles.navButton}>Order History</button>
           <button onClick={handlePortfolio} className={styles.navButton}>Portfolio</button>
+          <button onClick={handleOrderHistoryClick} className={styles.navButton}>Order Book</button>
+          <button onClick={handleClick} className={styles.navButton}>Manage Funds</button>
+          <button onClick={handleTradeHistoryClick} className={styles.navButton}>Trade Book</button>
+          <button onClick={handleBookedPL} className={styles.navButton}>Booked P/L</button>
         </div>
       </div>
 
