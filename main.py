@@ -205,9 +205,9 @@ def get_orders(userId: str):  # Assuming userId is the email
             raise HTTPException(status_code=404, detail="User not found")  # Handle case where user doesn't exist
         
         user_id = user['id']  
-        
+        time=now.date()
         with connection.cursor(dictionary=True) as cursor:
-            cursor.execute("SELECT * FROM order_history WHERE u_id = %s order by o_id desc", (user_id,))
+            cursor.execute("SELECT * FROM order_history WHERE u_id = %s and time=%s order by o_id desc", (user_id,time))
             orders = cursor.fetchall()
 
         if orders:

@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import { useRouter } from 'next/navigation';
-import '../styles/bookedPL.module.css';
-
+import styles from '../styles/bookedPL.module.css';
+import { ToastContainer,toast } from 'react-toastify';
 const BookedPLPage = () => {
     const router = useRouter();
     const [data, setData] = useState([]);
@@ -39,7 +39,6 @@ const BookedPLPage = () => {
                     });
                     const result = await response.json();
 
-                    // Transform object into array format
                     const transformedData = Object.entries(result).map(([symbol, profit_loss]) => ({
                         symbol,
                         profit_loss,
@@ -54,13 +53,22 @@ const BookedPLPage = () => {
             };
             fetchBookedPL();
         }
-    }, [userId]); // Fetch only when userId is set
+    }, [userId]);
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
 
     return (
         <div>
+            <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        progress={undefined}
+      />
             <Navbar
                 handleClick={handleClick}
                 handleOrderHistoryClick={handleOrderHistoryClick}
@@ -69,13 +77,13 @@ const BookedPLPage = () => {
                 handleTradeHistoryClick={handleTradeHistoryClick}
                 handleBookedPL={handleBookedPL}
             />
-            <div className="booked-pl-container">
+            <div className={styles['booked-pl-container']}>
                 <h2>Booked P/L</h2>
-                <div className="booked-pl-cards">
+                <div className={styles['booked-pl-cards']}>
                     {data.map((item, index) => (
-                        <div className="booked-pl-card" key={index}>
+                        <div className={styles['booked-pl-card']} key={index}>
                             <h3>{item.symbol}</h3>
-                            <p className={item.profit_loss >= 0 ? "profit" : "loss"}>
+                            <p className={item.profit_loss >= 0 ? styles['profit'] : styles['loss']}>
                                 {item.profit_loss.toLocaleString("en-US", {
                                     style: "currency",
                                     currency: "USD",

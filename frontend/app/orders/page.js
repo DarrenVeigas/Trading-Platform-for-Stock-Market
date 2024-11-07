@@ -5,7 +5,7 @@ import styles from '../styles/Orders.module.css';
 import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { ToastContainer,toast } from 'react-toastify';
 export default function Orders() {
     const [orderHistory, setOrderHistory] = useState([]);
     const [error, setError] = useState(null);
@@ -74,6 +74,15 @@ export default function Orders() {
 
     return (
         <div>
+            <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        progress={undefined}
+      />
         <div className={styles.dashboardContainer}>
         <Navbar 
             handleClick={handleClick} 

@@ -5,7 +5,7 @@ import styles from '../styles/Orders.module.css';
 import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { ToastContainer,toast } from 'react-toastify';
 export default function Orders() {
     const [orderHistory, setOrderHistory] = useState([]);
     const [error, setError] = useState(null);
@@ -47,7 +47,7 @@ export default function Orders() {
     const fetchOrders = async (userEmail) => {
         try {
             const response = await fetch(`http://localhost:8000/trades?userId=${userEmail}`, {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -58,7 +58,7 @@ export default function Orders() {
                 toast.error('Order History could not be fetched')
                 console.error("Fetch Error:", errorData);
                 setError(`Error fetching orders: ${errorData.detail}`);
-                return; // Exit if there's an error
+                return; 
             }
 
             const data = await response.json();
@@ -73,6 +73,15 @@ export default function Orders() {
 
     return (
         <div>
+            <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        progress={undefined}
+      />
         <div className={styles.dashboardContainer}>
             <Navbar 
             handleClick={handleClick} 
