@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, EmailStr
 from db_helper_new import gen,get_wallet,hold,calculate_realized_profit_loss
 from datetime import datetime,timedelta
+import asyncio
 
 load_dotenv()
 api_key=os.getenv('tAPI_KEY1')
@@ -55,7 +56,7 @@ app.add_middleware(
 def create_connection():
     try:
         connection = mysql.connector.connect(**DATABASE_CONFIG)
-        print("Connection to MySQL DB successful")
+
         return connection
     except Exception as e:
         print(f"The error '{e}' occurred")
@@ -189,7 +190,7 @@ class Order(BaseModel):
     quantity: int
     price: float
     time: datetime = None    
-
+    status: str = None
 @app.get("/orders")
 def get_orders(userId: str):  # Assuming userId is the email
     connection = create_connection()
@@ -214,7 +215,7 @@ def get_orders(userId: str):  # Assuming userId is the email
             for order in orders:
                 order['time'] = order['time'].isoformat()    
                 order['price'] = float(order['price'])
-        print(orders)
+
         if orders:
             return JSONResponse(content={"orders": orders}, status_code=200)
         else:
@@ -240,9 +241,6 @@ async def create_order(order: Order):
     with connection.cursor(dictionary=True) as cursor:
         cursor.execute("SELECT price FROM stock_data WHERE symbol = %s", (order.symbol,))
         price_for_buy=cursor.fetchone()
-
-    if (price_for_buy['price'] - 1.5> order.price) and order.action=="buy":
-        raise HTTPException(status_code=400, detail="Please quote a higher value")
 
     if (order.action == 'buy' and price_for_buy['price'] <= order.price) or (order.action == 'sell' and price_for_buy['price'] >= order.price):
         status = "completed"
@@ -279,7 +277,7 @@ async def create_order(order: Order):
     INSERT INTO order_history (u_id, price, time, quantity, symbol, action,status)
     VALUES (%s, %s, %s, %s, %s, %s,%s)
     """
-    values = (user_id, order.price, order_time, order.quantity, order.symbol, order.action,status)  # Use user_id instead of order.u_id
+    values = (user_id, order.price, order_time, order.quantity, order.symbol, order.action,status)  
 
     try:
         with connection.cursor() as cursor:
@@ -458,6 +456,50 @@ async def bookpl(request: UserIdRequest):
             user = cursor.fetchone()
     user_id=user['id']  
     return calculate_realized_profit_loss(user_id)
+
+async def check_processing_orders():
+    while True:
+        connection = create_connection()
+        if connection is None:
+            print("Database connection failed")
+            await asyncio.sleep(5)
+            continue
+        
+        try:
+            with connection.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT * FROM order_history WHERE status = 'processing'")
+                processing_orders = cursor.fetchall()
+                
+
+            for order in processing_orders:
+                symbol = order['symbol']
+                target_price = order['price']
+                order_id = order['o_id']
+                action=order['action']
+
+                with connection.cursor(dictionary=True) as cursor:
+                    cursor.execute("SELECT price FROM stock_data WHERE symbol = %s", (symbol,))
+                    current_price = cursor.fetchone()
+
+                if (action == 'buy' and current_price['price'] <= target_price) or (action == 'sell' and current_price['price'] >= target_price):
+                    # Update the order status to completed
+                    with connection.cursor() as cursor:
+                        cursor.execute("UPDATE order_history SET status = 'completed' WHERE o_id = %s", (order_id,))
+                        print("Order changed to Completed")
+                        connection.commit()
+                    print(f"Order {order_id} completed as target price {target_price} was reached.")
+
+        except Exception as e:
+            print(f"Error checking orders: {e}")
+        finally:
+            connection.close()
+        
+        await asyncio.sleep(5)  
+
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(check_processing_orders()) 
 
 if __name__ == "__main__":
     import uvicorn
