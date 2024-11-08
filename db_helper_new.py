@@ -141,12 +141,16 @@ def read_symbol(symbol):
 
 def get_wallet(userId):
     cursor,conn=new_connect()
-    cursor.execute('''select id,type,changes,wallet_balance from users,wallet where users.id=wallet.u_id and email=%s''',(userId,))
+    cursor.execute('''select id,type,changes,wallet_balance,transaction_id from users,
+                   wallet where users.id=wallet.u_id and email=%s
+                   ORDER BY transaction_id DESC LIMIT 5''',(userId,))
     rec=cursor.fetchall()
     d=[]
     for i in rec:
-        d.append({'id':i[0],'type':i[1],'amount':i[2]})
-    d.append(i[3])
+        x= float(i[2])
+        d.append({'id':i[0],'type':i[1],'amount':x})
+    x=float(i[3])
+    d.append(x)
     cursor.close()
     conn.close()
     return d
@@ -205,7 +209,7 @@ def calculate_realized_profit_loss(user_id):
 
         cursor.execute(query, (user_id,))
         result = cursor.fetchall()
-        realized_profit_loss_map = {row[0]: row[2] for row in result}  # row[0] is symbol, row[2] is realized_profit_loss
+        realized_profit_loss_map = {row[0]: float(row[2]) for row in result}  # row[0] is symbol, row[2] is realized_profit_loss
         return realized_profit_loss_map
 
     except Exception as e:

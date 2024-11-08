@@ -61,14 +61,14 @@ export default function Orders() {
       const handlePortfolio=()=>{
         router.push('/portfolio')
       }
-    
+      
       const handleLogout=()=>{
         localStorage.removeItem("userid");
         router.push('/login')
         }
 
     const handleBookedPL=()=>{
-        localStorage.removeItem("userid");
+        router.push('bookPL')
         }
 
     return (

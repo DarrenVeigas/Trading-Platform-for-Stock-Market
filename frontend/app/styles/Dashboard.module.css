@@ -99,4 +99,8 @@
   .mainContent {
     overflow-x: auto;
   }
-  
+  .logoLink {
+    text-decoration: none;
+    color: inherit; /* Keep original text color */
+    cursor: pointer;
+  }

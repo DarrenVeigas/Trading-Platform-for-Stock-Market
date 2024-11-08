@@ -213,7 +213,8 @@ def get_orders(userId: str):  # Assuming userId is the email
         if orders:
             for order in orders:
                 order['time'] = order['time'].isoformat()    
-        
+                order['price'] = float(order['price'])
+        print(orders)
         if orders:
             return JSONResponse(content={"orders": orders}, status_code=200)
         else:
@@ -243,12 +244,18 @@ async def create_order(order: Order):
     if (price_for_buy['price'] - 1.5> order.price) and order.action=="buy":
         raise HTTPException(status_code=400, detail="Please quote a higher value")
 
+    if (order.action == 'buy' and price_for_buy['price'] <= order.price) or (order.action == 'sell' and price_for_buy['price'] >= order.price):
+        status = "completed"
+    else:
+        status = "processing"
+
     order_time = order.time or datetime.now()
-    if order.action == "buy":
+    if order.action == "buy" and status=='completed':
         with connection.cursor(dictionary=True) as cursor:
             cursor.execute("SELECT wallet_balance FROM wallet WHERE u_id = %s ORDER BY transaction_id DESC LIMIT 1", (user_id,))
             wallet = cursor.fetchone()  # Get the most recent balance
-
+        if wallet is not None:
+            wallet['wallet_balance'] = float(wallet['wallet_balance'])
         if wallet is None or wallet['wallet_balance'] < order.price * order.quantity:
             raise HTTPException(status_code=400, detail="Insufficient balance to place the order")
 
@@ -256,22 +263,23 @@ async def create_order(order: Order):
         with connection.cursor() as cursor:
             cursor.execute("INSERT INTO wallet (u_id, wallet_balance,type,changes) VALUES (%s, %s,%s,%s)", (user_id, new_balance,'buy',order.price * order.quantity))
             connection.commit()
-    elif order.action=='sell':
+    elif order.action=='sell' and status=='completed':
         with connection.cursor(dictionary=True) as cursor:
             cursor.execute("SELECT wallet_balance FROM wallet WHERE u_id = %s ORDER BY transaction_id DESC LIMIT 1", (user_id,))
             wallet = cursor.fetchone() 
         if wallet is None:
             raise HTTPException(status_code=400, detail="Something went wrong!! Please try again later")
+        wallet['wallet_balance'] = float(wallet['wallet_balance'])
         new_balance = wallet['wallet_balance'] + (order.price * order.quantity)
         with connection.cursor() as cursor:
             cursor.execute("INSERT INTO wallet (u_id, wallet_balance,type,changes) VALUES (%s, %s,%s,%s)", (user_id, new_balance,'sell',order.price * order.quantity))
             connection.commit()
 
     sql = """
-    INSERT INTO order_history (u_id, price, time, quantity, symbol, action)
-    VALUES (%s, %s, %s, %s, %s, %s)
+    INSERT INTO order_history (u_id, price, time, quantity, symbol, action,status)
+    VALUES (%s, %s, %s, %s, %s, %s,%s)
     """
-    values = (user_id, order.price, order_time, order.quantity, order.symbol, order.action)  # Use user_id instead of order.u_id
+    values = (user_id, order.price, order_time, order.quantity, order.symbol, order.action,status)  # Use user_id instead of order.u_id
 
     try:
         with connection.cursor() as cursor:
@@ -319,13 +327,13 @@ def process_orders(order: UserRequest):
                     SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity,
                     SUM(CASE WHEN action = 'buy' THEN quantity * price ELSE -quantity * price END) AS total_amt_invst
                 FROM order_history
-                WHERE u_id = %s
+                WHERE u_id = %s and status='completed'
                 GROUP BY symbol, u_id
                 HAVING total_quantity >0;
                 """
                 cursor.execute(query, (user_id,))
                 aggregated_data = cursor.fetchall()
-                print(aggregated_data)
+
         if not aggregated_data:
             return {"message": "No portfolio data found for this user."}
         
@@ -390,7 +398,7 @@ def process_orders(order: UserRequest):
 
         
                 connection.commit()
-        print(aggregated_data)
+
         return aggregated_data
 
     except Exception as e:
@@ -428,6 +436,7 @@ async def trades(userId):
         if orders:
             for order in orders:
                 order['time'] = order['time'].isoformat()    
+                order['price'] = float(order['price'])
         
         if orders:
             return JSONResponse(content={"orders": orders}, status_code=200)
@@ -437,9 +446,12 @@ async def trades(userId):
         raise HTTPException(status_code=500, detail="Failed to fetch orders")
     finally:
         connection.close()
-
+class UserIdRequest(BaseModel):
+    userId: str
 @app.post('/bookpl')
-async def bookpl(userId):
+async def bookpl(request: UserIdRequest):
+    userId = request.userId
+    print(userId)
     connection=create_connection()
     with connection.cursor(dictionary=True) as cursor:
             cursor.execute("SELECT id FROM users WHERE email = %s", (userId,))

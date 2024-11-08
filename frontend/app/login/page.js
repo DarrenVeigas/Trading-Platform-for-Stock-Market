@@ -26,15 +26,20 @@ export default function Login() {
     });
 
     const data = await response.json();
-    toast.error(data.message || 'Invalid Email or Password', {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    if (!data.message){
+      toast.error('Invalid Email or Password', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });}
+    else{
+      toast.success(data.message)
+    }
+
 
     if (response.ok) {
       localStorage.setItem('userId', email); // Adjust based on your API response

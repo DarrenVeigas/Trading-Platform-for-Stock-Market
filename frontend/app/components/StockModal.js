@@ -89,7 +89,8 @@ const StockModal = ({ stock, symbol, onClose }) => {
       quantity: parseInt(quantity, 10),
       symbol: modalSymbol,
       action: action,
-      time: new Date().toISOString(),  // Ensure this is a valid date string
+      time: new Date().toISOString(),
+      status: "processing"   
   };
 
   console.log("Order Details:", orderDetails); // Log for debugging
@@ -159,6 +160,7 @@ const StockModal = ({ stock, symbol, onClose }) => {
         pauseOnHover
         draggable
         progress={undefined}
+        style={{ zIndex: 9999 }}
       />
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <h2>{symbol}</h2>

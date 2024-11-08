@@ -107,6 +107,7 @@ export default function Orders() {
                           <p>Quantity: {order.quantity}</p>
                           <p>Price: ${order.price.toFixed(2)}</p>
                           <p>Date: {new Date(order.time).toLocaleDateString()}</p>
+                          <p>Status: {order.status}</p> 
                       </li>
                   ))
               ) : !error && (

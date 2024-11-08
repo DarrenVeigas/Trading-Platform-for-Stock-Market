@@ -42,3 +42,30 @@
 .loss {
     color: red;
 }
+.container {
+    padding: 20px;
+  }
+  .totalPL {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .card {
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    background-color: #fff;
+    width: 120px;
+  }
+
+  .card h2 {
+    font-size: 1.2rem;
+  }
+  
+  .card p {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+

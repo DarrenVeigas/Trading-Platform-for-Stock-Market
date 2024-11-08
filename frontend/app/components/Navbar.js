@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from '../styles/Dashboard.module.css';
+import Link from 'next/link';
 
 const Navbar = ({ 
   handleClick, 
@@ -12,7 +13,9 @@ const Navbar = ({
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
-        <h1 className={styles.logo}>TradeWave</h1>
+      <Link href="/dashboard" passHref>
+          <h1 className={`${styles.logo} ${styles.logoLink}`}>TradeWave</h1>
+        </Link>
         <div className={styles.navButtons}>
           <button onClick={handlePortfolio} className={styles.navButton}>Portfolio</button>
           <button onClick={handleOrderHistoryClick} className={styles.navButton}>Order Book</button>

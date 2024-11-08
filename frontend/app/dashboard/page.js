@@ -39,7 +39,7 @@ const DashboardPage = () => {
     }
 
 const handleBookedPL=()=>{
-  router.push('/bookpl')
+  router.push('/bookPL')
     }
 
   return (
