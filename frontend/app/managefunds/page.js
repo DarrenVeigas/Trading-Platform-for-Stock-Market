@@ -13,11 +13,11 @@ const ManageFunds = () => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    const id = localStorage.getItem('userId'); // Get userId from local storage
-    if (id) {
-      setUserId(id);
+    if (typeof window !== 'undefined') {
+        const storedUserId = JSON.parse(sessionStorage.getItem('userId'));
+        setUserId(storedUserId);
     }
-  }, []);
+}, []); 
   const fetchTransactions = async () => {
     if (!userId) return; 
     try {
@@ -26,8 +26,8 @@ const ManageFunds = () => {
             headers: { 'Content-Type': 'application/json' },
         });
       const data = await response.json();
-      setTransactions(data.transactions);
-      settotal(data.amount)
+      setTransactions(data.transactions || []);
+      settotal(data.amount || 0)
       console.log(data)
     } catch (error) {
         console.error("Error fetching transactions:", error);
@@ -53,21 +53,23 @@ const ManageFunds = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId,  amount: parseFloat(amount),type})
         });
-        if (!response.ok) {
-
-            if (response.status === 500) {
-              toast.error('You have low account balance')
-            }}
         const result = await response.json();
-        
-        if (result.message) {
+
+        if (response.ok) {
           toast.success('Transaction completed successfully');
-          fetchTransactions();  // Refresh transaction history
+          setTimeout(fetchTransactions, 500);   
+        } else {
+          if (response.status === 500) {
+            toast.error('You have low account balance');
+          } else {
+            toast.error('Transaction failed');
+          }
         }
       } catch (error) {
-        toast.error('Error processing funds')
+        toast.error('Error processing funds');
         console.error(`Error processing ${type} funds:`, error);
-    }
+      }
+    
   };
 
   const router = useRouter();
@@ -86,10 +88,10 @@ const ManageFunds = () => {
     router.push('/portfolio')
   }
 
-  const handleLogout=()=>{
-    localStorage.removeItem("userid");
-    router.push('/login')
-    }
+  const handleLogout = () => {
+    sessionStorage.removeItem('userId'); 
+    router.push('/login'); 
+};
 
 const handleBookedPL=()=>{
     router.push('/bookPL')

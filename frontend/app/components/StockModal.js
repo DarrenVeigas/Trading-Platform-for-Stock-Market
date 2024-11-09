@@ -14,8 +14,14 @@ const StockModal = ({ stock, symbol, onClose }) => {
   const [action, setAction] = useState(null);
   const [historicalData, setHistoricalData] = useState([]);
   const [modalSymbol, setModalSymbol] = useState(symbol);
-  const [email, setEmail] = useState(null);
+  const [userId, setUserId] = useState(null);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const storedUserId = JSON.parse(sessionStorage.getItem('userId'));
+        setUserId(storedUserId);
+    }
+}, []);
   useEffect(() => {
     setModalSymbol(symbol); // Update modalSymbol when symbol prop changes
 }, [symbol]);
@@ -33,13 +39,6 @@ const StockModal = ({ stock, symbol, onClose }) => {
     };
   }, [onClose]);
 
-  useEffect(() => {
-    // Retrieve email from local storage
-    const storedEmail = localStorage.getItem('userId'); 
-    if (storedEmail) {
-        setEmail(storedEmail); // Save the email in state
-    }
-}, []);
 
   useEffect(() => {
     // Fetch historical data for the stock
@@ -84,7 +83,7 @@ const StockModal = ({ stock, symbol, onClose }) => {
       return;
     }
     const orderDetails = {
-      u_id: email, // Use the email state variable
+      u_id: userId, // Use the email state variable
       price: parseFloat(price),
       quantity: parseInt(quantity, 10),
       symbol: modalSymbol,
@@ -108,14 +107,17 @@ const StockModal = ({ stock, symbol, onClose }) => {
       if (response.ok) {
           const data = await response.json();
           toast.success('Order processed successfully!');
+          setTimeout(onClose, 3000);
         } else {
           const errorData = await response.json();
           toast.error(`Failed to create order: ${errorData.detail}`);
           console.error("Error details:", errorData);
+          setTimeout(onClose, 3000);
       }
   } catch (error) {
     toast.error('Error creating order. Please try again later.');
-    console.error("Network error:", error);;
+    console.error("Network error:", error);
+    setTimeout(onClose, 3000);
   }
     onClose();
   };

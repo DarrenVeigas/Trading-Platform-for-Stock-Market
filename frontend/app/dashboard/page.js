@@ -10,12 +10,12 @@ import { toast,ToastContainer } from 'react-toastify';
 const DashboardPage = () => {
   const [userId, setUserId] = useState(null);
 
-  useEffect(() => {
-    const id = localStorage.getItem('userId'); // Get userId from local storage
-    if (id) {
-      setUserId(id);
-    }
-  }, []);
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const storedUserId = JSON.parse(sessionStorage.getItem('userId'));
+            setUserId(storedUserId);
+        }
+    }, []);
   console.log(userId)
   const router = useRouter();
 
@@ -33,10 +33,10 @@ const DashboardPage = () => {
     router.push('/portfolio')
   }
 
-  const handleLogout=()=>{
-    localStorage.removeItem("userid");
-    router.push('/login')
-    }
+  const handleLogout = () => {
+    sessionStorage.removeItem('userId'); 
+    router.push('/login'); 
+};
 
 const handleBookedPL=()=>{
   router.push('/bookPL')

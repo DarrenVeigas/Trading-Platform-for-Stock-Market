@@ -12,7 +12,8 @@ export default function Orders() {
 
     useEffect(() => {
         // Retrieve email from local storage
-        const email = localStorage.getItem('userId');
+        const email = JSON.parse(sessionStorage.getItem('userId'));
+        console.log(email); 
         if (email) {
             fetchOrders(email);
         } else {
@@ -35,10 +36,10 @@ export default function Orders() {
         router.push('/portfolio')
       }
     
-      const handleLogout=()=>{
-        localStorage.removeItem("userid");
-        router.push('/login')
-        }
+      const handleLogout = () => {
+        sessionStorage.removeItem('userId'); 
+        router.push('/login'); 
+    };
 
     const handleBookedPL=()=>{
         localStorage.removeItem("userid");

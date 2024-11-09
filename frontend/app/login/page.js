@@ -42,10 +42,9 @@ export default function Login() {
 
 
     if (response.ok) {
-      localStorage.setItem('userId', email); // Adjust based on your API response
-      
+      sessionStorage.setItem('userId', JSON.stringify(email));      
       setTimeout(() => {
-        router.push('/dashboard'); // Redirect to home page after successful login
+        router.push('/dashboard'); 
       }, 2000);
     }
   };

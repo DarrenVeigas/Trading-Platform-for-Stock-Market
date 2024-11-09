@@ -9,16 +9,21 @@ import { ToastContainer,toast } from 'react-toastify';
 export default function Orders() {
     const [orderHistory, setOrderHistory] = useState([]);
     const [error, setError] = useState(null);
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        // Retrieve email from local storage
-        const email = localStorage.getItem('userId');
-        if (email) {
-            fetchOrders(email);
-        } else {
-            setError("User email not found. Please log in.");
+        if (typeof window !== 'undefined') {
+            console.log(sessionStorage)
+            const storedUserId = JSON.parse(sessionStorage.getItem('userId'));
+            setUserId(storedUserId);
+            if (storedUserId) {
+                fetchOrders(storedUserId); // Use storedUserId directly
+            } else {
+                setError("User email not found. Please log in.");
+            }
         }
     }, []);
+    
     const router = useRouter();
 
     const handleClick = () => {
@@ -35,18 +40,17 @@ export default function Orders() {
         router.push('/portfolio')
       }
     
-      const handleLogout=()=>{
-        localStorage.removeItem("userid");
-        router.push('/login')
-        }
-
+      const handleLogout = () => {
+        sessionStorage.removeItem('userId'); 
+        router.push('/login'); 
+    };
     const handleBookedPL=()=>{
         localStorage.removeItem("userid");
         }
 
-    const fetchOrders = async (userEmail) => {
+    const fetchOrders = async (userId) => {
         try {
-            const response = await fetch(`http://localhost:8000/trades?userId=${userEmail}`, {
+            const response = await fetch(`http://localhost:8000/trades?userId=${userId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

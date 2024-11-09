@@ -10,23 +10,23 @@ const BookedPLPage = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [userId, setUserId] = useState(null); // Make sure this is initialized as null
     const [totalPL, setTotalPL] = useState(0);
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        const id = localStorage.getItem('userId'); 
-        if (id && userId === null) { // Check only if userId is null
-            setUserId(id);
+        if (typeof window !== 'undefined') {
+            const storedUserId = JSON.parse(sessionStorage.getItem('userId'));
+            setUserId(storedUserId);
         }
-    }, [userId]); // Only run once when userId changes
-
+    }, []);
+    
     const handleClick = () => router.push('/managefunds');
     const handleOrderHistoryClick = () => router.push('/orders');
     const handleTradeHistoryClick = () => router.push('/trades');
     const handlePortfolio = () => router.push('/portfolio');
     const handleLogout = () => {
-        localStorage.removeItem("userId");
-        router.push('/login');
+        sessionStorage.removeItem('userId'); 
+        router.push('/login'); 
     };
     const handleBookedPL = () => router.push('/booked-pl');
 

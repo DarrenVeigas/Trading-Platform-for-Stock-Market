@@ -149,7 +149,7 @@ def get_wallet(userId):
     for i in rec:
         x= float(i[2])
         d.append({'id':i[0],'type':i[1],'amount':x})
-    x=float(i[3])
+    x=float(rec[0][3])
     d.append(x)
     cursor.close()
     conn.close()

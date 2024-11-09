@@ -12,7 +12,8 @@ export default function Orders() {
 
     useEffect(() => {
         // Retrieve user ID from local storage
-        const userId = localStorage.getItem('userId'); 
+        const userId = JSON.parse(sessionStorage.getItem('userId'));
+        console.log(userId); 
         if (userId) {
             fetchPortfolio(userId);
         }
@@ -62,10 +63,10 @@ export default function Orders() {
         router.push('/portfolio')
       }
       
-      const handleLogout=()=>{
-        localStorage.removeItem("userid");
-        router.push('/login')
-        }
+      const handleLogout = () => {
+        sessionStorage.removeItem('userId'); 
+        router.push('/login'); 
+    };
 
     const handleBookedPL=()=>{
         router.push('bookPL')
